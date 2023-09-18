@@ -1,0 +1,41 @@
+name: Android Build
+
+on:
+  push:
+
+jobs:
+  android-build:
+    name: Android Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout git repo
+        uses: actions/checkout@v4
+    
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+      
+      - name: Install node dependencies
+        run: npm ci
+        
+      - name: Run ESLint 
+        run: npm run lint
+      
+      - name: Run Jest Tests
+        run: npm run test
+      
+      - name: set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'zulu'
+
+      - name: Gradle Builds
+        uses: gradle/gradle-build-action@v2
+        with:
+          build-root-directory: android
+          arguments: |
+            bundle
+            assembleRelease
